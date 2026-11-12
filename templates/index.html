@@ -1,0 +1,330 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>ReelRate | Discover. Rate. Repeat.</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+
+        <a href="/" class="logo">REEL<span>RATE.</span></a>
+
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="#collection">Explore</a>
+            <a href="#about">About</a>
+        </div>
+
+        <span class="nav-tag">YOUR MOVIE DESTINATION</span>
+
+    </nav>
+
+
+    <!-- Hero Section -->
+    <section class="hero">
+
+        <div class="hero-content">
+
+            <p class="eyebrow">THE WORLD OF CINEMA</p>
+
+            <h1>
+                Discover films.<br>
+                <span>Compare ratings.</span>
+            </h1>
+
+            <p class="hero-description">
+                Explore handpicked movies and anime, compare IMDb
+                ratings and share your own opinion.
+            </p>
+
+            <a href="#collection" class="hero-button">
+                EXPLORE TITLES →
+            </a>
+
+        </div>
+
+        <div class="hero-feature">
+
+            <p class="eyebrow">FEATURED COLLECTION</p>
+
+            <h2>INTERSTELLAR</h2>
+
+            <p>2014 &nbsp; • &nbsp; SCI-FI / DRAMA</p>
+
+            <div class="feature-rating">
+                <div>
+                    <small>IMDb RATING</small>
+                    <strong>8.7 / 10</strong>
+                </div>
+
+                <div>
+                    <small>REELRATE</small>
+                    <strong>USER SCORES</strong>
+                </div>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- Collection -->
+    <main class="collection" id="collection">
+
+        <div class="section-heading">
+
+            <div>
+                <p class="eyebrow">CURATED FOR YOU</p>
+                <h2>Explore the <span>Collection.</span></h2>
+                <p class="muted">
+                    Explore selected movies and anime. Two rating perspectives.
+                </p>
+            </div>
+
+            <span class="title-count">
+                {{ movies|length }} TITLES
+            </span>
+
+        </div>
+
+
+        <!-- Search and category filters -->
+        <form action="/" method="GET" class="filter-bar">
+
+            <input
+                type="text"
+                name="search"
+                placeholder="Search movies..."
+                value="{{ search }}"
+                class="search-input"
+            >
+
+            <div class="filter-buttons">
+
+                <button type="submit" name="category"
+                        value="All"
+                        class="{% if category == 'All' %}selected{% endif %}">
+                    All
+                </button>
+
+                <button type="submit" name="category"
+                        value="Movies"
+                        class="{% if category == 'Movies' %}selected{% endif %}">
+                    Movies
+                </button>
+
+                <button type="submit" name="category"
+                        value="Anime"
+                        class="{% if category == 'Anime' %}selected{% endif %}">
+                    Anime
+                </button>
+
+            </div>
+
+        </form>
+
+
+        <!-- Movie Cards -->
+        <div class="movie-grid">
+
+            {% for movie in movies %}
+
+            <article class="movie-card">
+
+                <a href="#movie-{{ movie.id }}" class="poster-link">
+
+                    <img
+                        src="{{ url_for('static', filename=movie.poster) }}"
+                        alt="{{ movie.name }} poster"
+                        class="poster"
+                    >
+
+                </a>
+
+                <div class="movie-info">
+
+                    <p class="genre">{{ movie.genre }}</p>
+
+                    <h3>{{ movie.name }}</h3>
+
+                    <p class="year">{{ movie.year }}</p>
+
+                    <div class="ratings">
+
+                        <div>
+                            <span class="star">★</span>
+                            <strong>{{ movie.imdb }}</strong>
+                            <small>IMDb</small>
+                        </div>
+
+                        <div>
+                            <span class="star">★</span>
+
+                            <strong>
+                                {% if movie.ratings|length > 0 %}
+                                    {{ (movie.ratings|sum / movie.ratings|length)|round(1) }}
+                                {% else %}
+                                    --
+                                {% endif %}
+                            </strong>
+
+                            <small>REELRATE</small>
+                        </div>
+
+                    </div>
+
+                    <a href="#movie-{{ movie.id }}" class="details-link">
+                        VIEW DETAILS →
+                    </a>
+
+                </div>
+
+            </article>
+
+            {% else %}
+
+            <div class="no-results">
+                <h3>No titles found.</h3>
+                <p>Try another search or category.</p>
+                <a href="/">Show all titles</a>
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+    </main>
+
+
+    <!-- Movie Details and Rating -->
+    <section class="details-section">
+
+        <div class="section-heading">
+            <div>
+                <p class="eyebrow">YOUR OPINION MATTERS</p>
+                <h2>Rate your <span>favourites.</span></h2>
+            </div>
+        </div>
+
+        {% for movie in movies %}
+
+        <article class="detail-card" id="movie-{{ movie.id }}">
+
+            <img
+                src="{{ url_for('static', filename=movie.poster) }}"
+                alt="{{ movie.name }} poster"
+            >
+
+            <div class="detail-content">
+
+                <p class="eyebrow">{{ movie.category }}</p>
+
+                <h2>{{ movie.name }}</h2>
+
+                <p class="detail-meta">
+                    {{ movie.year }} • {{ movie.genre }}
+                </p>
+
+                <p class="description">
+                    {{ movie.description }}
+                </p>
+
+                <div class="detail-ratings">
+
+                    <div>
+                        <strong>★ {{ movie.imdb }}/10</strong>
+                        <small>IMDb Rating</small>
+                    </div>
+
+                    <div>
+                        <strong>
+                            {% if movie.ratings|length > 0 %}
+                                ★ {{ (movie.ratings|sum / movie.ratings|length)|round(1) }}/10
+                            {% else %}
+                                ★ --/10
+                            {% endif %}
+                        </strong>
+                        <small>ReelRate Average</small>
+                    </div>
+
+                </div>
+
+                <form
+                    action="{{ url_for('rate_movie', movie_id=movie.id) }}"
+                    method="POST"
+                    class="rating-form"
+                >
+
+                    <label for="rating-{{ movie.id }}">
+                        GIVE YOUR RATING (0–10)
+                    </label>
+
+                    <div class="rating-input-row">
+
+                        <input
+                            type="number"
+                            name="rating"
+                            id="rating-{{ movie.id }}"
+                            min="0"
+                            max="10"
+                            step="0.1"
+                            placeholder="e.g. 9.5"
+                            required
+                        >
+
+                        <button type="submit">
+                            SUBMIT RATING →
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </article>
+
+        {% endfor %}
+
+    </section>
+
+
+    <!-- About -->
+    <section class="about" id="about">
+
+        <p class="eyebrow">ABOUT REELRATE</p>
+
+        <h2>Discover. <span>Rate. Repeat.</span></h2>
+
+        <p>
+            ReelRate is a movie and anime discovery platform.
+            Explore selected titles, compare IMDb reference scores
+            and contribute your own ratings.
+        </p>
+
+    </section>
+
+
+    <!-- Footer -->
+    <footer>
+
+        <a href="/" class="logo">REEL<span>RATE.</span></a>
+
+        <p>DISCOVER. RATE. REPEAT.</p>
+
+        <small>© 2026 REELRATE — STUDENT PROJECT</small>
+
+    </footer>
+
+</body>
+</html>
